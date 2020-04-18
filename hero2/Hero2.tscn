@@ -1,0 +1,77 @@
+[gd_scene load_steps=17 format=2]
+
+[ext_resource path="res://hero2/AnimationPlayer.gd" type="Script" id=1]
+[ext_resource path="res://hero2/Hero.glb" type="PackedScene" id=2]
+[ext_resource path="res://hero/CoatG.tres" type="Material" id=3]
+[ext_resource path="res://hero/Pack.material" type="Material" id=4]
+[ext_resource path="res://hero/PackG.tres" type="Material" id=5]
+[ext_resource path="res://hero/Face.material" type="Material" id=6]
+[ext_resource path="res://Tree/TreeSoloScene.tscn" type="PackedScene" id=7]
+
+[sub_resource type="AnimationNodeAnimation" id=7]
+animation = "Death"
+
+[sub_resource type="AnimationNodeAnimation" id=1]
+animation = "Idle"
+
+[sub_resource type="AnimationNodeAnimation" id=2]
+animation = "Walk"
+
+[sub_resource type="AnimationNodeAnimation" id=3]
+animation = "Run"
+
+[sub_resource type="AnimationNodeAnimation" id=9]
+animation = "Idle"
+
+[sub_resource type="AnimationNodeBlendSpace1D" id=4]
+blend_point_0/node = SubResource( 1 )
+blend_point_0/pos = -1.0
+blend_point_1/node = SubResource( 2 )
+blend_point_1/pos = 0.5
+blend_point_2/node = SubResource( 3 )
+blend_point_2/pos = 1.0
+blend_point_3/node = SubResource( 9 )
+blend_point_3/pos = 0.0
+min_space = 0.0
+
+[sub_resource type="AnimationNodeStateMachineTransition" id=8]
+advance_condition = "isDead"
+
+[sub_resource type="AnimationNodeStateMachine" id=5]
+states/Death/node = SubResource( 7 )
+states/Death/position = Vector2( 487, 64 )
+states/alive/node = SubResource( 4 )
+states/alive/position = Vector2( 246, 64 )
+transitions = [ "alive", "Death", SubResource( 8 ) ]
+start_node = "alive"
+
+[sub_resource type="AnimationNodeStateMachinePlayback" id=6]
+
+[node name="Hero" instance=ExtResource( 2 )]
+
+[node name="Skeleton" parent="Armature" index="0"]
+bones/7/bound_children = [ NodePath("BackPackAttachment") ]
+
+[node name="HeroMesh" parent="Armature/Skeleton" index="0"]
+material/0 = ExtResource( 3 )
+material/1 = ExtResource( 4 )
+material/2 = ExtResource( 5 )
+material/3 = ExtResource( 6 )
+
+[node name="BackPackAttachment" type="BoneAttachment" parent="Armature/Skeleton" index="1"]
+transform = Transform( 1, 1.55556e-15, 2.38419e-07, 2.9146e-08, 0.9925, -0.122247, -2.3663e-07, 0.122247, 0.9925, -7.67649e-16, 0.393349, -0.267915 )
+bone_name = "bone_7"
+
+[node name="Tree" parent="Armature/Skeleton/BackPackAttachment" index="0" instance=ExtResource( 7 )]
+transform = Transform( 1, 6.79653e-09, -3.85768e-10, -6.80678e-09, 0.999101, -0.0423988, 9.68378e-11, 0.0423988, 0.999101, 0.000229394, 0.00224487, -0.02285 )
+
+[node name="AnimationPlayer" parent="." index="1"]
+script = ExtResource( 1 )
+
+[node name="AnimationTree" type="AnimationTree" parent="." index="2"]
+tree_root = SubResource( 5 )
+anim_player = NodePath("../AnimationPlayer")
+active = true
+parameters/playback = SubResource( 6 )
+parameters/conditions/isDead = false
+parameters/alive/blend_position = 0.167643
